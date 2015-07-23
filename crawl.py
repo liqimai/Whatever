@@ -19,6 +19,7 @@ class crawl:
         self.baseurl=baseurl
         self.read_web.add(baseurl)
 
+<<<<<<< HEAD
     
     def user_agent(self,url): #宽度优先遍历网页
         try:
@@ -73,6 +74,59 @@ class crawl:
                 self.user_agent(self.urlqueue.pop(0))
         except socket.timeout as e:
                 self.user_agent(self.urlqueue.pop(0))
+=======
+	
+	def user_agent(self,url): #宽度优先遍历网页
+		try:
+			print("it's the %d time"%(self.count))
+			self.count=self.count+1
+			if(self.count<=100):#搜索网页数
+       				req = urllib2.Request(url,None,self.req_header)
+        			page = urllib2.urlopen(req,None,self.req_timeout)
+        			html = page.read()
+				page.close()
+				soup = BeautifulSoup(html)
+				
+				#getinf(html,url) 李奇卖实现
+				
+				self.urls.append(url)
+				a = soup.find_all(['a'])
+				for i in a:
+					tmpurl=i.get('href')
+					if(tmpurl is not None and tmpurl.find('javascript')==-1):
+						if(tmpurl.find('http')==-1):
+							tmpurl=self.baseurl+'/'+tmpurl
+						if(tmpurl not in self.read_web):
+							#print(tmpurl)
+							self.read_web.add(tmpurl)
+							self.urlqueue.append(tmpurl)
+							tmpurl=''
+				#c=raw_input()
+				time.sleep(0.1)
+				nexturl=self.urlqueue.pop(0)
+				self.user_agent(nexturl)
+			else: #结束了
+				with open('data','a') as FILE:
+					for item in self.urls:
+						try:
+							FILE.write(item+'\n')
+						except:
+							print ('data wrong')
+							pass
+				with open('queue','w') as qq:
+					for item in self.urlqueue:
+						try:
+							qq.write(item+'\n')
+						except:
+							print ('queue wrong')
+							pass
+			#return html
+		except urllib2.URLError as e:
+        		print e.message
+        		self.user_agent(self.urlqueue.pop(0))
+		except socket.timeout as e:
+        		self.user_agent(self.urlqueue.pop(0))
+>>>>>>> 4271155dfbf2acf5ac742ba7560b8a61325cd5e9
 
     
     def fillset(self,data,queue):#将以前访问过的网站加入set，重新获取queue
