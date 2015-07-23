@@ -55,3 +55,14 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# Data
+data
+queue
+dict
+
+# Others
+*.gz
+*.zip
+beautifulsoup4-4.4.0/
+jieba-master/
