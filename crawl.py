@@ -37,7 +37,7 @@ class crawl:
 				a = soup.find_all(['a'])
 				for i in a:
 					tmpurl=i.get('href')
-					if(isinstance(tmpurl,str) and tmpurl.find('javascript')==-1):
+					if(tmpurl is not None and tmpurl.find('javascript')==-1):
 						if(tmpurl.find('http')==-1):
 							tmpurl=self.baseurl+'/'+tmpurl
 						if(tmpurl not in self.read_web):
