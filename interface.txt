@@ -19,27 +19,28 @@ file:
 	
 	invertedindex
 		store a dictionary, which structure is below
-# {
-# 'term':
-#     [
-#         df=0,    #document frequency
-#         [
-#             [    #record the relation between this term and a url
-#                 urlid=0,
-#                 tf=0,        #term frequency
-#                 tf_idf=0     #normalized tf_idf
-#             ],
-#             [    #Another record
-#                 urlid=0,
-#                 tf=0,
-#                 tf_idf=0
-#             ]
-#             ...
-#         ]
-#     ],
-# 'Another Term':
-#     [
-#     ...
-#     ],
-# ...
-# }
+
+{
+    'term':
+        [
+            df=0,   #document frequency
+            {   #urlid-record dictionary
+                urlid:  #   a record
+                    [
+                        tf=0,   #term frequency
+                        tf_idf=0    #normalized tf-idf
+                    ],
+                urlid:  #   Another record
+                    [
+                        tf=0,
+                        tf_idf=0
+                    ]
+                ...
+            }
+        ]
+    'Another term':
+        [
+            ...
+        ],
+    ...
+}
