@@ -59,7 +59,9 @@ target/
 # Data
 data
 queue
-dict
+testData
+invertedindex
+*.dat
 
 # Others
 *.gz
