@@ -18,6 +18,29 @@ file:
 		urlid url indegree outdegree
 	
 	invertedindex
-		the number of term 
-		一行一条记录:
-		term df [urlid tf tf_idf]...
+		store a dictionary, which structure is below
+
+{
+    'term':
+        [
+            df=0,   #document frequency
+            {   #urlid-record dictionary
+                urlid:  #   a record
+                    [
+                        tf=0,   #term frequency
+                        tf_idf=0    #normalized tf-idf
+                    ],
+                urlid:  #   Another record
+                    [
+                        tf=0,
+                        tf_idf=0
+                    ]
+                ...
+            }
+        ]
+    'Another term':
+        [
+            ...
+        ],
+    ...
+}
