@@ -4,7 +4,7 @@ import time
 import urllib2
 from bs4 import BeautifulSoup
 import socket
-
+from Indexbuild import IndexBuilder
 class crawl:
 	baseurl=''
 	req_header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
@@ -20,6 +20,7 @@ class crawl:
 	
 	def __init__(self,baseurl):#将主网址加入集合
 		self.baseurl=baseurl
+		self.indexbuilder = IndexBuilder()
 
 	
 	def user_agent(self,url): #宽度优先遍历网页
@@ -36,16 +37,16 @@ class crawl:
 				tmpoutdegree=0
 				print("it's the %d time"%(self.count))
 				self.count=self.count+1
-				if(self.count<=100):#搜索网页数
-       					req = urllib2.Request(url,None,self.req_header)
-        				page = urllib2.urlopen(req,None,self.req_timeout)
-        				html = page.read()
+				if(self.count <= 10):#搜索网页数
+					req = urllib2.Request(url,None,self.req_header)
+					page = urllib2.urlopen(req,None,self.req_timeout)
+					html = page.read()
 					page.close()
-					soup = BeautifulSoup(html,'lxml')			
+					soup = BeautifulSoup(html)			
 					self.urls.append(url)
 					self.indegree.append(1)
 
-					#ibuilder.process(urls.size()-1,html) 李奇卖实现
+					self.indexbuilder.process(soup)
 
 					a = soup.find_all(['a'])
 					for i in a:
@@ -54,7 +55,7 @@ class crawl:
 							if(tmpurl.find('http')==-1):
 								tmpurl=self.baseurl+'/'+tmpurl
 							if(tmpurl.find('www.cc98.org')!=-1):
-								#print(tmpurl)
+								# print(tmpurl)
 								self.urlqueue.append(tmpurl)
 								tmpurl=''
 								tmpoutdegree=tmpoutdegree+1
@@ -64,6 +65,7 @@ class crawl:
 					nexturl=self.urlqueue.pop(0)
 					self.user_agent(nexturl)
 				else: #结束了
+					self.indexbuilder.save()
 					with open('queue','w') as qq:
 						for item in self.urlqueue:
 							try:
@@ -86,10 +88,10 @@ class crawl:
 								pass
 				#return html
 		except urllib2.URLError as e:
-        		print e.message
-        		self.user_agent(self.urlqueue.pop(0))
+				print e.message
+				self.user_agent(self.urlqueue.pop(0))
 		except socket.timeout as e:
-        		self.user_agent(self.urlqueue.pop(0))
+				self.user_agent(self.urlqueue.pop(0))
 		except:
 			pass
 	
@@ -117,10 +119,10 @@ class crawl:
 
 #main
 if __name__ == '__main__':
-        baseurl="http://www.cc98.org"
-        cc=crawl(baseurl)
-        if(os.path.exists('urllist') and os.path.exists('queue')):
-        	cc.fillset('urllist','queue') #检查是否继续上次爬取
-	        cc.user_agent(cc.baseurl)
-        else:
-	        cc.user_agent(baseurl)
+		baseurl="http://www.cc98.org"
+		cc=crawl(baseurl)
+		if(os.path.exists('urllist') and os.path.exists('queue')):
+			cc.fillset('urllist','queue') #检查是否继续上次爬取
+			cc.user_agent(cc.baseurl)
+		else:
+			cc.user_agent(baseurl)

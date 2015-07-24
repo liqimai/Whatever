@@ -38,9 +38,9 @@ class IndexBuilder(object):
         except IOError as err:
             print('Rebuild the Inverted Index')
 
-    def process(self,html,urlid): 
+    def process(self,soup): 
+        urlid = self.__urlnum
         self.__urlnum = self.__urlnum + 1
-        soup = BeautifulSoup(html,'html.parser')
         text = soup.get_text()
         for word in self.__p.normalize(text):
             # if word not in index :
@@ -108,13 +108,13 @@ class IndexBuilder(object):
 if __name__ == '__main__':
     import sys
     indexbuilder = IndexBuilder()
-    urlnum = indexbuilder._IndexBuilder__urlnum
+    # urlnum = indexbuilder._IndexBuilder__urlnum
     files = ['test0.dat','test1.dat']
-    for fileName, i in zip(files, xrange(urlnum, urlnum + len(files))):
+    for fileName in files:
         # print fileName
         # print type(fileName)
         with open(fileName,'r') as fin:
-            indexbuilder.process(fin,i)
+            indexbuilder.process(BeautifulSoup(fin,'html.parser'))
     indexbuilder.save()
     print(indexbuilder)
 
