@@ -27,7 +27,7 @@ class crawl:
 
 	
 	def user_agent(self,url): #宽度优先遍历网页
-		while self.count < 1000:
+		while self.count < 2000:
 			try:
 				if(url in self.read_web):
 					try:
