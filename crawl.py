@@ -2,9 +2,11 @@
 import os
 import time
 import urllib2
+import sys
 from bs4 import BeautifulSoup
 import socket
 from Indexbuild import IndexBuilder
+
 class crawl:
 	baseurl=''
 	req_header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
@@ -25,8 +27,8 @@ class crawl:
 
 	
 	def user_agent(self,url): #宽度优先遍历网页
-		try:
-			while self.count < 2000:
+		while self.count < 1000:
+			try:
 				if(url in self.read_web):
 					try:
 						self.indegree[self.urls.index(url)]+=1
@@ -61,42 +63,42 @@ class crawl:
 					#c=raw_input()
 					self.outdegree.append(tmpoutdegree)
 					time.sleep(0.2)
-				if(len(self.urlqueue)>0):
-					url=self.urlqueue.pop(0);
-				#结束了
-			self.indexbuilder.save()
-			with open('queue','w') as qq:
-				print('Writing queue back into file...')
-				for item in self.urlqueue:
-					try:
-						if(item is not None):
-							qq.write(item+'\n')
-					except:
-						print ('queue wrong but things well')
-						pass
-		
-			with open('urllist','w') as uu:
-				uu.write('%d\n'%(len(self.urls)))
-				i=0
-				print('Writing urllist back into file...')
-				for item in self.urls:
-					try:
-						uu.write('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
-						i+=1
-					except:
-						print('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
-						print ('urls output wrong')
-						pass
-				#return html
-		except urllib2.URLError as e:
-				print e.message
-				self.user_agent(self.urlqueue.pop(0))
-		except socket.timeout as e:
-				print e.message
-				self.user_agent(self.urlqueue.pop(0))
-		except Exception as e:
-			print(e)
-			self.user_agent(self.urlqueue.pop(0))
+			except urllib2.URLError as e:
+				print type(e), e.message, e.args
+				print url
+			except socket.timeout as e:
+				print type(e), e.message, e.args
+				print url
+			except Exception as e:
+				print e
+				print url
+			if(len(self.urlqueue)>0):
+				url=self.urlqueue.pop(0);
+			#结束了
+		self.indexbuilder.save()
+		with open('queue','w') as qq:
+			print('Writing queue back into file...')
+			for item in self.urlqueue:
+				try:
+					if(item is not None):
+						qq.write(item+'\n')
+				except:
+					print ('queue wrong but things well')
+					pass
+	
+		with open('urllist','w') as uu:
+			uu.write('%d\n'%(len(self.urls)))
+			i=0
+			print('Writing urllist back into file...')
+			for item in self.urls:
+				try:
+					uu.write('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
+					i+=1
+				except:
+					print('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
+					print ('urls output wrong')
+					pass
+			#return html
 
 	def fillset(self,urllist,queue):#将以前访问过的网站加入set，重新获取queue
 		with open(urllist,'r') as FILE:

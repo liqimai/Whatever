@@ -2,6 +2,7 @@
 from bs4 import BeautifulSoup
 from parse import Parser
 import math
+import json
 # {
 #     'term':
 #         [
@@ -35,15 +36,17 @@ class IndexBuilder(object):
         try :
             with open('invertedindex','r') as fin:
                 self.__urlnum = int(fin.readline())
-                i = 0
-                key = ''
-                val = ''
-                for line in fin:
-                    if i == 0:
-                        key = eval(line)
-                    if i == 1:
-                        val = eval(line)
-                        self.index.update({key:val})
+                line = fin.readline()
+                self.index = json.loads(line)
+                # i = 0
+                # key = ''
+                # val = ''
+                # for line in fin:
+                #     if i == 0:
+                #         key = eval(line)
+                #     if i == 1:
+                #         val = eval(line)
+                #         self.index.update({key:val})
         except IOError as err:
             print(err.args)
             print('Rebuild the Inverted Index')
@@ -79,9 +82,10 @@ class IndexBuilder(object):
             with open('invertedindex','w') as fout:
                 print('Save back to \"invertedindex\"...')
                 fout.write(str(self.__urlnum)+'\n')
-                for key,value in self.index.items():
-                    fout.write(repr(key)+'\n')
-                    fout.write(repr(value)+'\n')
+                fout.write(json.dumps(self.index))
+                # for key,value in self.index.items():
+                #     fout.write(repr(key)+'\n')
+                #     fout.write(repr(value)+'\n')
 
         except IOError as err:
             print(err)
