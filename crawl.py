@@ -68,6 +68,7 @@ class crawl:
 				else: #结束了
 					self.indexbuilder.save()
 					with open('queue','w') as qq:
+						print('Writing queue back into file...')
 						for item in self.urlqueue:
 							try:
 								if(item is not None):
@@ -79,6 +80,7 @@ class crawl:
 					with open('urllist','w') as uu:
 						uu.write('%d\n'%(len(self.urls)))
 						i=0
+						print('Writing urllist back into file...')
 						for item in self.urls:
 							try:
 								uu.write('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
@@ -102,11 +104,12 @@ class crawl:
 			totalcount=FILE.readline()
 			for item in FILE.readlines():
 				try:
-					(tmpid,tmpurl,tmpind,tmpoud)=(item.strip('\n').split(' '))
+					(tmpid,tmpurl,tmpind,tmpoud,tmplen)=(item.strip('\n').split(' '))
 					self.urls.append(tmpurl)
 					self.read_web.add(tmpurl)
 					self.indegree.append(int(tmpind))
 					self.outdegree.append(int(tmpoud))
+					self.length.append(int(tmplen))
 				except:
 					print('read in data error')
 

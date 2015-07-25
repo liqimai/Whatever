@@ -49,6 +49,19 @@ class IndexBuilder(object):
                 record = records.setdefault(urlid,[0,0])
                 record[0] = record[0] + 1
                 length = length + 1
+        try :
+            title = soup.title.string
+        except:
+            title = None
+        if title is not None:
+            title = unicode(title)[:-16]*5
+        if title :
+            for word in self.__p.normalize(title):
+                records = self.index.setdefault(word,[0,{},0])[1]
+                record = records.setdefault(urlid,[0,0])
+                record[0] = record[0] + 1
+                length = length + 1
+
         return length
 
     def save(self):
@@ -106,8 +119,8 @@ if __name__ == '__main__':
     import sys
     indexbuilder = IndexBuilder()
     urlnum = indexbuilder._IndexBuilder__urlnum
-    files = ['test0.dat','test1.dat']
-    for fileName, i in zip(files(),xrange(urlnum,urlnum+len(files))):
+    files = ['test.html','test0.dat']
+    for fileName, i in zip(files,xrange(urlnum,urlnum+len(files))):
         # print fileName
         # print type(fileName)
         with open(fileName,'r') as fin:

@@ -64,6 +64,7 @@ invertedindex
 *.dat
 
 # Others
+*test*
 *.gz
 *.zip
 beautifulsoup4-4.4.0/
