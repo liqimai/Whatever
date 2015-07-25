@@ -15,7 +15,7 @@ file:
 	urllist
 		the number of urls
 		一行存一条记录：
-		urlid url indegree outdegree
+		urlid url indegree outdegree length_of_texts
 	
 	invertedindex
 		store a dictionary, which structure is below
@@ -28,7 +28,7 @@ file:
                 urlid:  #   a record
                     [
                         tf=0,   #term frequency
-                        tf_idf=0    #normalized tf-idf
+                        tf_idf=0,    #normalized tf-idf
                     ],
                 urlid:  #   Another record
                     [
@@ -36,7 +36,8 @@ file:
                         tf_idf=0
                     ]
                 ...
-            }
+            },
+            cf  #collection frequency, total number of this term in the whole collection
         ]
     'Another term':
         [

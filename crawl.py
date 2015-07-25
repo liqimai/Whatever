@@ -13,6 +13,7 @@ class crawl:
 	urls=[]
 	indegree=[]
 	outdegree=[]
+	length = []
 	head=[]
 	totalcount=0
 	count=0
@@ -46,7 +47,7 @@ class crawl:
 					self.urls.append(url)
 					self.indegree.append(1)
 
-					self.indexbuilder.process(soup)
+					self.length.append(self.indexbuilder.process(soup,len(self.urls)-1))
 
 					a = soup.find_all(['a'])
 					for i in a:
@@ -80,10 +81,10 @@ class crawl:
 						i=0
 						for item in self.urls:
 							try:
-								uu.write('%d %s %d %d\n'%(i,item,self.indegree[i],self.outdegree[i]))
+								uu.write('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
 								i+=1
 							except:
-								print('%d %s %d %d\n'%(i,item,self.indegree[i],self.outdegree[i]))
+								print('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
 								print ('urls output wrong')
 								pass
 				#return html
