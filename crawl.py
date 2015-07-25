@@ -26,19 +26,17 @@ class crawl:
 	
 	def user_agent(self,url): #宽度优先遍历网页
 		try:
-			if(url in self.read_web):
-				try:
-					self.indegree[self.urls.index(url)]+=1
-				except:
-					pass
-				if(len(self.urlqueue)>0):
-					self.user_agent(self.urlqueue.pop(0))
-			else:
-				self.read_web.add(url)
-				tmpoutdegree=0
-				print("it's the %d time"%(self.count))
-				self.count=self.count+1
-				if(self.count <= 500):#搜索网页数
+			while self.count < 2000:
+				if(url in self.read_web):
+					try:
+						self.indegree[self.urls.index(url)]+=1
+					except:
+						pass
+				else:
+					self.read_web.add(url)
+					tmpoutdegree=0
+					print("it's the %d time"%(self.count))
+					self.count=self.count+1#搜索网页数
 					req = urllib2.Request(url,None,self.req_header)
 					page = urllib2.urlopen(req,None,self.req_timeout)
 					html = page.read()
@@ -63,41 +61,42 @@ class crawl:
 					#c=raw_input()
 					self.outdegree.append(tmpoutdegree)
 					time.sleep(0.2)
-					nexturl=self.urlqueue.pop(0)
-					self.user_agent(nexturl)
-				else: #结束了
-					self.indexbuilder.save()
-					with open('queue','w') as qq:
-						print('Writing queue back into file...')
-						for item in self.urlqueue:
-							try:
-								if(item is not None):
-									qq.write(item+'\n')
-							except:
-								print ('queue wrong but things well')
-								pass
-			
-					with open('urllist','w') as uu:
-						uu.write('%d\n'%(len(self.urls)))
-						i=0
-						print('Writing urllist back into file...')
-						for item in self.urls:
-							try:
-								uu.write('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
-								i+=1
-							except:
-								print('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
-								print ('urls output wrong')
-								pass
+				if(len(self.urlqueue)>0):
+					url=self.urlqueue.pop(0);
+				#结束了
+			self.indexbuilder.save()
+			with open('queue','w') as qq:
+				print('Writing queue back into file...')
+				for item in self.urlqueue:
+					try:
+						if(item is not None):
+							qq.write(item+'\n')
+					except:
+						print ('queue wrong but things well')
+						pass
+		
+			with open('urllist','w') as uu:
+				uu.write('%d\n'%(len(self.urls)))
+				i=0
+				print('Writing urllist back into file...')
+				for item in self.urls:
+					try:
+						uu.write('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
+						i+=1
+					except:
+						print('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
+						print ('urls output wrong')
+						pass
 				#return html
 		except urllib2.URLError as e:
 				print e.message
 				self.user_agent(self.urlqueue.pop(0))
 		except socket.timeout as e:
+				print e.message
 				self.user_agent(self.urlqueue.pop(0))
 		except Exception as e:
 			print(e)
-	
+			self.user_agent(self.urlqueue.pop(0))
 
 	def fillset(self,urllist,queue):#将以前访问过的网站加入set，重新获取queue
 		with open(urllist,'r') as FILE:

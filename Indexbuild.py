@@ -35,8 +35,17 @@ class IndexBuilder(object):
         try :
             with open('invertedindex','r') as fin:
                 self.__urlnum = int(fin.readline())
-                self.index = eval(fin.readline()+'\n')
+                i = 0
+                key = ''
+                val = ''
+                for line in fin:
+                    if i == 0:
+                        key = eval(line)
+                    if i == 1:
+                        val = eval(line)
+                        self.index.update({key:val})
         except IOError as err:
+            print(err.args)
             print('Rebuild the Inverted Index')
 
     def process(self,soup,urlid): 
@@ -70,7 +79,10 @@ class IndexBuilder(object):
             with open('invertedindex','w') as fout:
                 print('Save back to \"invertedindex\"...')
                 fout.write(str(self.__urlnum)+'\n')
-                fout.write(repr(self.index))
+                for key,value in self.index.items():
+                    fout.write(repr(key)+'\n')
+                    fout.write(repr(value)+'\n')
+
         except IOError as err:
             print(err)
             print('Can not write back to \"invertedindex\"!!!')
