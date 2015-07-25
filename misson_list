@@ -1,0 +1,13 @@
+1.searcher->1) I/O 2) pagerank
+2.ui server
+3.correction->1. English Levenshtein distance
+4.LM(how to decide coefficient)
+5.feedback->vector revise
+6.query expansion->co-occurence
+7.regular
+8.and or not
+9.tiered index
+10.BIM->short catalog records of fairly consistent length
+11.pkapi BM25
+12.position
+13.k-gram
