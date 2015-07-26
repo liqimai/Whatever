@@ -61,9 +61,11 @@ urllist
 queue
 testData
 invertedindex
+graph
 *.dat
 
 # Others
+*.txt
 *test*
 *.gz
 *.zip

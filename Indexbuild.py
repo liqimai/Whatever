@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from parse import Parser
 import math
 import json
+import sys
 # {
 #     'term':
 #         [
@@ -29,13 +30,14 @@ import json
 #     ...
 # }
 class IndexBuilder(object):
-    def __init__(self):
+    def __init__(self,invertedindex='invertedindex'):
         self.__p = Parser()
         self.index = {}
         self.__urlnum = 0
+        self.__fileName = invertedindex
         try :
-            with open('invertedindex','r') as fin:
-                print 'Reading invertedindex in...'
+            with open(invertedindex,'r') as fin:
+                sys.stderr.write( 'Reading invertedindex in...')
                 self.__urlnum = int(fin.readline())
                 line = fin.readline()
                 self.index = json.loads(line)
@@ -48,9 +50,10 @@ class IndexBuilder(object):
                 #     if i == 1:
                 #         val = eval(line)
                 #         self.index.update({key:val})
+                sys.stderr.write( '[Success]'+'\n')
         except IOError as err:
-            print type(err), err.args
-            print('Rebuild the Inverted Index')
+            sys.stderr.write( str(type(err)) + str(err.args)+'\n')
+            sys.stderr.write('Will rebuild the Inverted Index'+'\n')
 
     def process(self,soup,urlid): 
         urlid = str(urlid)
@@ -81,21 +84,22 @@ class IndexBuilder(object):
     def save(self):
         self.__calculateTf_idf()
         try :
-            with open('invertedindex','w') as fout:
-                print('Save back to \"invertedindex\"...')
+            with open(self.__fileName,'w') as fout:
+                sys.stderr.write( 'Save back to \"invertedindex\"...')
                 fout.write(str(self.__urlnum)+'\n')
                 fout.write(json.dumps(self.index))
                 # for key,value in self.index.items():
                 #     fout.write(repr(key)+'\n')
                 #     fout.write(repr(value)+'\n')
+                sys.stderr.write( '[Success]'+'\n')
 
         except IOError as err:
-            print(err)
-            print('Can not write back to \"invertedindex\"!!!')
+            sys.stderr.write(str(err)+'\n')
+            sys.stderr.write('Can not write back to \"invertedindex\"!!!'+'\n')
         return
 
     def __calculateTf_idf(self) :
-        print 'Calculating...'
+        sys.stderr.write( 'Calculating...')
         #tf-idf = (1+log(tf,base))*log(N/df,base)
         base = 10
         for postingList in self.index.itervalues():
@@ -105,7 +109,7 @@ class IndexBuilder(object):
             for record in postingList[1].itervalues():
                 tf = record[0]
                 record[1] = (1+math.log(tf,base))*math.log(self.__urlnum/float(df),base)
-                # print 'tf_idf=',record[1]
+                # sys.stderr.write( 'tf_idf=',record[1]+'\n')
                 postingList[2] = postingList[2] + tf
         for i in xrange(self.__urlnum):    #for every urlnum
             i = str(i)
@@ -115,15 +119,16 @@ class IndexBuilder(object):
                 tf_idf = records.get(i,[0,0])[1]
                 length = length + tf_idf*tf_idf
                 # if i in records:
-                #     print 'tf_idf = ', tf_idf
-                #     print 'changed vector length =',length
+                #     sys.stderr.write( 'tf_idf = ', tf_idf+'\n')
+                #     sys.stderr.write( 'changed vector length =',length+'\n')
             length = math.sqrt(length)
-            # print i, 'vector length =',length
+            # sys.stderr.write( i, 'vector length =',length+'\n')
             for postingList in self.index.itervalues():  #for every term records
                 records = postingList[1]
                 if i in records:
                     record = records[i]
                     record[1] = record[1] / length
+        sys.stderr.write( '[Success]'+'\n')
         return
 
     def __str__(self):

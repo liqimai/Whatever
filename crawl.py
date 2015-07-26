@@ -6,11 +6,11 @@ import sys
 from bs4 import BeautifulSoup
 import socket
 from Indexbuild import IndexBuilder
-
+import json
 class crawl:
 	baseurl=''
 	req_header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
-	req_timeout = 5
+	req_timeout = 54
 	urlqueue=[]
 	urls=[]
 	indegree=[]
@@ -20,20 +20,42 @@ class crawl:
 	totalcount=0
 	count=0
 	read_web=set()
+	graph = []
 	
-	def __init__(self,baseurl):#将主网址加入集合
+	def __init__(self,baseurl='http://www.cc98.org',urllist='urllist',queue='queue',invertedindex='invertedindex',graph='graph'):#将主网址加入集合
 		self.baseurl=baseurl
-		self.indexbuilder = IndexBuilder()
-
+		self.queueName = queue
+		self.urllistName = urllist
+		self.graphName = graph
+		if os.path.exists(self.urllistName) and os.path.exists(self.queueName) and os.path.exists(self.graphName):
+			self.indexbuilder = IndexBuilder(invertedindex)
+			self.fillset(self.urllistName, self.queueName, self.graphName) #检查是否继续上次爬取
+		else:
+			self.indexbuilder = IndexBuilder()
 	
-	def user_agent(self,url): #宽度优先遍历网页
-		while self.count < 5000:
+	def user_agent(self, loopnum): #宽度优先遍历网页
+		if self.urlqueue:
+			url_parent = self.urlqueue.pop(0)
+			url = url_parent[0]
+			parent = url_parent[1]
+		else:
+			url = self.baseurl
+			parent = self.baseurl
+		while self.count < loopnum:
 			try:
 				if(url in self.read_web):
 					try:
-						self.indegree[self.urls.index(url)]+=1
-					except:
-						pass
+						urlid = self.urls.index(url)
+					except Exception as e:
+						print e
+					try:
+						self.indegree[urlid]+=1
+					except Exception as e:
+						print e
+					try:
+						self.graph[urlid][self.urls.index(parent)] = 1
+					except Exception as e:
+						print e,e.args
 				else:
 					self.read_web.add(url)
 					tmpoutdegree=0
@@ -45,20 +67,26 @@ class crawl:
 					page.close()
 					soup = BeautifulSoup(html)			
 					self.urls.append(url)
+					self.graph.append([])
+					for i in xrange(len(self.urls)-1): 
+						self.graph[i].append(0)
+						self.graph[len(self.urls)-1].append(0)
+					self.graph[len(self.urls)-1].append(0)
 					self.indegree.append(1)
+					self.graph[len(self.graph)-1][self.urls.index(parent)] = 1
 
 					self.length.append(self.indexbuilder.process(soup,len(self.urls)-1))
 
 					a = soup.find_all(['a'])
 					for i in a:
-						tmpurl=i.get('href')
-						if(tmpurl is not None and tmpurl.find('javascript')==-1):
-							if(tmpurl.find('http')==-1):
-								tmpurl=self.baseurl+'/'+tmpurl
-							if(tmpurl.find('www.cc98.org')!=-1):
-								# print(tmpurl)
-								self.urlqueue.append(tmpurl)
-								tmpurl=''
+						suburl=i.get('href')
+						if(suburl is not None and suburl.find('javascript')==-1):
+							if(suburl.find('http')==-1):
+								suburl=self.baseurl+'/'+suburl
+							if(suburl.find('www.cc98.org')!=-1):
+								# print(suburl)
+								self.urlqueue.append([suburl,url])
+								suburl=''
 								tmpoutdegree=tmpoutdegree+1
 					#c=raw_input()
 					self.outdegree.append(tmpoutdegree)
@@ -73,20 +101,23 @@ class crawl:
 				print e
 				print url
 			if(len(self.urlqueue)>0):
-				url=self.urlqueue.pop(0);
+				url_parent = self.urlqueue.pop(0)
+				url = url_parent[0]
+				parent = url_parent[1]
 			#结束了
+	def save(self):
 		self.indexbuilder.save()
-		with open('queue','w') as qq:
-			print('Writing queue back into file...')
+		with open(self.queueName,'w') as qq:
+			sys.stderr.write('Writing queue back into file...\n')
 			for item in self.urlqueue:
 				try:
 					if(item is not None):
-						qq.write(item+'\n')
+						qq.write(item[0]+' '+item[1]+'\n')
 				except:
-					print ('queue wrong but things well')
+					sys.stderr.write('queue wrong but things well\n')
 					pass
 	
-		with open('urllist','w') as uu:
+		with open(self.urllistName,'w') as uu:
 			uu.write('%d\n'%(len(self.urls)))
 			i=0
 			print('Writing urllist back into file...')
@@ -95,12 +126,28 @@ class crawl:
 					uu.write('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
 					i+=1
 				except:
-					print('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i]))
-					print ('urls output wrong')
+					sys.stderr.write('%d %s %d %d %d\n'%(i, item, self.indegree[i], self.outdegree[i], self.length[i])+'\n')
+					sys.stderr.write('urls output wrong\n')
 					pass
 			#return html
+		with open(self.graphName,'w') as gg:
+			try:
+				gg.write(json.dumps(self.graph))
+			except Exception as e:
+				sys.stderr.write(repr(e)+'\n')
+				sys.stderr.write('Graph store error\n')
 
-	def fillset(self,urllist,queue):#将以前访问过的网站加入set，重新获取queue
+		with open('graph.txt','w') as file:
+			try:
+				for line in self.graph:
+					for entry in line:
+						file.write(str(entry)+' ')
+					file.write('\n')
+			except Exception as e:
+				sys.stderr.write(repr(e)+'\n')
+				sys.stderr.write('Graph.txt write error\n')
+
+	def fillset(self,urllist,queue,graph):#将以前访问过的网站加入set，重新获取queue
 		with open(urllist,'r') as FILE:
 			totalcount=FILE.readline()
 			for item in FILE.readlines():
@@ -111,23 +158,27 @@ class crawl:
 					self.indegree.append(int(tmpind))
 					self.outdegree.append(int(tmpoud))
 					self.length.append(int(tmplen))
-				except:
-					print('read in data error')
+				except Exception as e:
+					sys.stderr.write(repr(e))
+					sys.stderr.write('read in data error\n')
 
-		with open(queue,'r') as FILE1:
-			for item in FILE1.readlines():
+		with open(queue,'r') as FILE:
+			for item in FILE.readlines():
 				try:
-					self.urlqueue.append(item.strip('\n'))
-				except:
-					print('read queue in error but well')
-		self.baseurl=self.urlqueue.pop(0)#重设主网址
+					self.urlqueue.append(item.strip('\n').split(' '))
+				except Exception as e:
+					sys.stderr.write(repr(e))
+					sys.stderr.write('read queue in error but well\n')
+
+		with open(graph,'r') as FILE:
+			try:
+				self.graph = json.loads(FILE.readline())
+			except Exception as e:
+				sys.stderr.write(repr(e))
+				sys.stderr.write('Read graph error\n')
 
 #main
 if __name__ == '__main__':
-		baseurl="http://www.cc98.org"
-		cc=crawl(baseurl)
-		if(os.path.exists('urllist') and os.path.exists('queue')):
-			cc.fillset('urllist','queue') #检查是否继续上次爬取
-			cc.user_agent(cc.baseurl)
-		else:
-			cc.user_agent(baseurl)
+	cc=crawl()
+	cc.user_agent(1000)
+	cc.save()
