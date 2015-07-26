@@ -35,6 +35,7 @@ class IndexBuilder(object):
         self.__urlnum = 0
         try :
             with open('invertedindex','r') as fin:
+                print 'Reading invertedindex in...'
                 self.__urlnum = int(fin.readline())
                 line = fin.readline()
                 self.index = json.loads(line)
@@ -48,10 +49,11 @@ class IndexBuilder(object):
                 #         val = eval(line)
                 #         self.index.update({key:val})
         except IOError as err:
-            print(err.args)
+            print type(err), err.args
             print('Rebuild the Inverted Index')
 
     def process(self,soup,urlid): 
+        urlid = str(urlid)
         self.__urlnum = self.__urlnum + 1
         text = soup.get_text()
         length = 0
@@ -93,6 +95,7 @@ class IndexBuilder(object):
         return
 
     def __calculateTf_idf(self) :
+        print 'Calculating...'
         #tf-idf = (1+log(tf,base))*log(N/df,base)
         base = 10
         for postingList in self.index.itervalues():
@@ -102,14 +105,20 @@ class IndexBuilder(object):
             for record in postingList[1].itervalues():
                 tf = record[0]
                 record[1] = (1+math.log(tf,base))*math.log(self.__urlnum/float(df),base)
+                # print 'tf_idf=',record[1]
                 postingList[2] = postingList[2] + tf
         for i in xrange(self.__urlnum):    #for every urlnum
+            i = str(i)
             length = 0
             for postingList in self.index.itervalues():  #for every term records
                 records = postingList[1]
                 tf_idf = records.get(i,[0,0])[1]
                 length = length + tf_idf*tf_idf
+                # if i in records:
+                #     print 'tf_idf = ', tf_idf
+                #     print 'changed vector length =',length
             length = math.sqrt(length)
+            # print i, 'vector length =',length
             for postingList in self.index.itervalues():  #for every term records
                 records = postingList[1]
                 if i in records:
@@ -134,13 +143,11 @@ class IndexBuilder(object):
 if __name__ == '__main__':
     import sys
     indexbuilder = IndexBuilder()
-    urlnum = indexbuilder._IndexBuilder__urlnum
-    files = ['test.html','test0.dat']
-    for fileName, i in zip(files,xrange(urlnum,urlnum+len(files))):
-        # print fileName
-        # print type(fileName)
-        with open(fileName,'r') as fin:
-            indexbuilder.process(BeautifulSoup(fin),i)
+    if '-r' not in sys.argv:
+        urlnum = indexbuilder._IndexBuilder__urlnum
+        files = ['test.html','test0.dat']
+        for fileName, i in zip(files,xrange(urlnum,urlnum+len(files))):
+            with open(fileName,'r') as fin:
+                indexbuilder.process(BeautifulSoup(fin),i)
     indexbuilder.save()
-    print(indexbuilder)
 
