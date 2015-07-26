@@ -25,7 +25,7 @@ file:
         [
             df=0,   #document frequency
             {   #urlid-record dictionary
-                urlid:  #   a record
+                urlid:  #   <ATTENTION> Urlid is a str!!!!,for example:"53" </ATTENTION>
                     [
                         tf=0,   #term frequency
                         tf_idf=0,    #normalized tf-idf
