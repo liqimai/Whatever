@@ -182,5 +182,5 @@ class crawl:
 #main
 if __name__ == '__main__':
 	cc=crawl()
-	cc.user_agent(5000)
+	cc.user_agent(int(sys.argv[1]))
 	cc.save()
