@@ -32,6 +32,7 @@ class crawl:
 			self.fillset(self.urllistName, self.queueName, self.graphName) #检查是否继续上次爬取
 		else:
 			self.indexbuilder = IndexBuilder()
+			pass
 	
 	def user_agent(self, loopnum): #宽度优先遍历网页
 		if self.urlqueue:
@@ -141,15 +142,17 @@ class crawl:
 		with open('graph.txt','w') as file:
 			print('Writing graph.txt back into file...')
 			try:
-				for line in self.graph:
-					for entry in line:
-						file.write(str(entry)+' ')
+				for i in xrange(len(self.graph)):
+					for j in xrange(len(self.graph)):
+						if self.graph[i][j] == 1:
+							file.write(str(i)+' '+str(j)+' ')
 					file.write('\n')
 			except Exception as e:
 				sys.stderr.write(repr(e)+'\n')
 				sys.stderr.write('Graph.txt write error\n')
 
 	def fillset(self,urllist,queue,graph):#将以前访问过的网站加入set，重新获取queue
+		sys.stderr.write('Reload queue, urllist, graph...')
 		with open(urllist,'r') as FILE:
 			totalcount=FILE.readline()
 			for item in FILE.readlines():
@@ -178,6 +181,8 @@ class crawl:
 			except Exception as e:
 				sys.stderr.write(repr(e))
 				sys.stderr.write('Read graph error\n')
+
+		sys.stderr.write('[Success]\n')
 
 #main
 if __name__ == '__main__':
