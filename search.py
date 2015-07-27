@@ -6,6 +6,8 @@ from Indexbuild import IndexBuilder
 import math
 import time
 import sys
+import urllib2
+from bs4 import BeautifulSoup
 #辅助类 用于建立id和score的关系
 class id_score:
     def __init__(self,urlid,score):
@@ -134,6 +136,21 @@ class searcher:
             urlids.append(tmp)
         urlids.reverse()
         return urlids
+
+    def gettitle(url):
+        try:
+            req_header = {'User-Agent':'Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.1.6) Gecko/20091201 Firefox/3.5.6'}
+            req = urllib2.Request(url,None,req_header)
+            page = urllib2.urlopen(req,None,54)
+            html = page.read()
+            page.close()
+            soup = BeautifulSoup(html)  
+            title = soup.title
+            title = title.string
+        except Exception as e:
+            print e
+            title = None
+        return title
 
 if __name__ == '__main__':
     import urllib2
