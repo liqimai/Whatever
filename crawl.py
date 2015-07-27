@@ -131,13 +131,15 @@ class crawl:
 					pass
 			#return html
 		with open(self.graphName,'w') as gg:
+			print('Writing graph back into file...')
 			try:
-				gg.write(json.dumps(self.graph))
+				json.dump(self.graph,gg,indent = 1)
 			except Exception as e:
 				sys.stderr.write(repr(e)+'\n')
 				sys.stderr.write('Graph store error\n')
 
 		with open('graph.txt','w') as file:
+			print('Writing graph.txt back into file...')
 			try:
 				for line in self.graph:
 					for entry in line:
@@ -172,7 +174,7 @@ class crawl:
 
 		with open(graph,'r') as FILE:
 			try:
-				self.graph = json.loads(FILE.readline())
+				self.graph = json.load(FILE)
 			except Exception as e:
 				sys.stderr.write(repr(e))
 				sys.stderr.write('Read graph error\n')
@@ -180,5 +182,5 @@ class crawl:
 #main
 if __name__ == '__main__':
 	cc=crawl()
-	cc.user_agent(1000)
+	cc.user_agent(5000)
 	cc.save()

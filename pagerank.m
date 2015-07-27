@@ -4,7 +4,7 @@ add = ones(1,n);
 mul = zeros(n,n);
 Im = zeros(n,n);
 outdegree = add*graph;
-d = 0.5;
+d = 0.85;
 for i = 1:n
     o = outdegree(i);
     if(o>0)
@@ -17,3 +17,9 @@ A = Im-graph*mul.*0.85;
 b = ones(n,1)*(1-d)/n;
 [x,flag,relres,iter,resverc]=bicg(A,b,1e-11);
 disp(x);
+
+file = fopen('pagerank','w');
+for i = 1:n
+    fprintf(file,'%.4e\n',x(i,1));
+end
+fclose(file);

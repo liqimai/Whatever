@@ -39,8 +39,7 @@ class IndexBuilder(object):
             with open(invertedindex,'r') as fin:
                 sys.stderr.write( 'Reading invertedindex in...')
                 self.__urlnum = int(fin.readline())
-                line = fin.readline()
-                self.index = json.loads(line)
+                self.index = json.load(fin)
                 # i = 0
                 # key = ''
                 # val = ''
@@ -87,7 +86,7 @@ class IndexBuilder(object):
             with open(self.__fileName,'w') as fout:
                 sys.stderr.write( 'Save back to \"invertedindex\"...')
                 fout.write(str(self.__urlnum)+'\n')
-                fout.write(json.dumps(self.index))
+                json.dump(self.index,fout,indent=1)
                 # for key,value in self.index.items():
                 #     fout.write(repr(key)+'\n')
                 #     fout.write(repr(value)+'\n')
