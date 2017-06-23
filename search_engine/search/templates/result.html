@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}搜索结果{% endblock %}
+
+{% block content %}
+<div id="logo" style="text-align: center">
+    {% load staticfiles %}
+    <img src="{% static "images/bg3.png" %}" alt="bg image"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'search/style.css' %}" />
+</div>
+
+<form action="/search/" method="get">
+    <div  style="width: 100%; text-align: center;margin-top: 10">
+        <input type="text" name="q" maxlength="100" size="60" value="{{ q }}">
+        <select type = "text" name = "select_algo" id = "select_algo">
+            <option value = "boolean">布尔算法</option>
+            <option value = "tf_idf">tf-idf算法</option> 
+{#            <option value = "tf_idf_pagerank">tf-idf-PageRank算法</option> #}
+            <option value = "Okapi">Okapi算法</option>
+{#            <option value = "Okapi_pagerank">Okapi-PageRank算法</option>#}
+{#            <option value = "lm">LM算法</option>#}
+{#            <option value = "lm_pagerank">LM-PageRank算法</option>          #}
+        </select>
+{#        <select type = "text" name = "correctornot" id = "correctornot">#}
+{#            <option value = "1">普通修正</option>#}
+{#            <option value = "2">精确修正</option>                        #}
+{#        </select>#}
+        <input type="text" name="k" maxlength="5" size="5" pattern="[0-9]+" placeholder="k" value="0"/>
+        <input type="submit" value="搜索">
+    </div>
+</form>
+
+<div>
+    {% if correct_result %}
+        <div style="margin-bottom: 50; text-shadow:3px 3px 3px #666">
+            <font face = "华文行楷" size = 4 color = "white">
+                <p>&nbsp&nbsp&nbsp&nbsp&nbsp您可能想搜索:<br></p>
+            </font>
+        </div>
+
+                {% for cor_term in correct_result %}
+                    <div style="margin-bottom: 50; text-shadow:3px 3px 3px #666">
+                    <a href = "{{ cor_term.url_addre }}"><font face = "微软雅黑" size = 4 color = "white">{{ cor_term.url_name }}<br></font></a>
+                    </div>
+                {% endfor %}
+        
+    {% else %}
+    {% endif %}
+</div>
+
+<div style="margin-bottom: 50; text-shadow:3px 3px 3px #666">
+    <font face = "华文行楷" size = 4 color = "white">
+    <p> &nbsp&nbsp&nbsp&nbsp&nbsp共搜索到{{ total_number }}个结果 </p>
+    </font>
+</div>
+{% if search_result %}
+    <ul>
+    {% load pagination_tags %}
+    {% autopaginate search_result 5 %}
+    {% for item in search_result %}
+        <hr />
+        <div style="margin-bottom: 20; text-shadow:3px 3px 3px #666">
+            
+            <a href="{{ item.url }}">
+                <font face = "微软雅黑" size = 4 color = "white">
+                <br>{{ forloop.counter }}. {{ item.title }}<br>
+                </font>
+            </a>
+            <p>
+            <font face = "微软雅黑" size = 3 color = "white">
+                {% if item.abstract %}
+                    {% for ab_item in item.abstract %}
+                        &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp{{ ab_item.abstract1 }}<mark>{{ ab_item.abstract2 }}</mark>{{ ab_item.abstract3 }}<br>
+                    {% endfor %}
+                    <br>
+                {% endif %}
+            </font>
+            </p>
+            
+        </div>  
+    {% endfor %}
+    {% paginate %}
+    <ul>
+{% else %}
+<div style = "text-shadow:3px 3px 3px #666">
+
+    <p>
+        <font face = "华文行楷" size = 4 color = "white">试试搜索一下别的吧，亲~
+        </font>
+    </p>
+</div>
+{% endif %}
+{% endblock %}
+
+
+{% block footer %}
+<div style="text-align: center; margin-top: 50; text-shadow:1px 1px 1px #666">
+    <a href = "http://127.0.0.1:8000/"><font face = "宋体" size = 4 color = "white">
+    <br>返回首页</font></a>
+    
+</div>
+{% endblock %}

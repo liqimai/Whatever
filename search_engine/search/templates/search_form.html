@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Whatever{% endblock %}
+
+{% block content %}
+<div id="logo" style="text-align: center; margin-top: 15%">
+    {% load staticfiles %}
+    <img src="{% static "images/bg3.png" %}" alt="bg image"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'search/style.css' %}" />
+</div>
+
+<form action="/search/" method="get">
+    <div  style="width: 100%; text-align: center;margin-top: 10px">
+        <input type="text" name="q" maxlength="100" size="60"/>
+        <select type = "text" name = "select_algo" id = "select_algo">
+            <option value = "boolean">布尔算法</option>
+            <option value = "tf_idf">tf-idf算法</option> 
+{#            <option value = "tf_idf_pagerank">tf-idf-PageRank算法</option> #}
+            <option value = "Okapi">Okapi算法</option>
+{#            <option value = "Okapi_pagerank">Okapi-PageRank算法</option>#}
+{#            <option value = "lm">LM算法</option>#}
+{#            <option value = "lm_pagerank">LM-PageRank算法</option>          #}
+        </select>
+
+{#        <select type = "text" name = "correctornot" id = "correctornot">#}
+{#            <option value = "1">普通修正</option>#}
+{#            <option value = "2">精确修正</option>                        #}
+{#        </select>#}
+        <input type="text" name="k" maxlength="5" size="5" pattern="[0-9]+" placeholder="k" value="0"/>
+
+        <input type="submit" value="搜索"/>
+
+    </div>
+</form>
+{% endblock %}
+
+{% block footer %}
+<div style=" text-align: center; margin-top: 50; text-shadow:1px 1px 1px #666">
+    
+    <a href = "http://127.0.0.1:8000/"><font face = "华文行楷" size = 4 color = "white"><br>返回首页
+    </font>
+    </a>
+</div>
+{% endblock %}

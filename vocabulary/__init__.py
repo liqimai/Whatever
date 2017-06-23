@@ -1,0 +1,3 @@
+"""
+Imports class 'Vocabulary'
+"""

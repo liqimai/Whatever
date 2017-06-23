@@ -1,0 +1,21 @@
+<!DOCTYPE HTML PUBLIC "‐//W3C//DTD HTML 4.01//EN">
+<html lang="en">
+<head>
+    <style>
+        mark{
+        	background-color: white;
+        	color: black;
+        	/*font-weight: bold;*/
+        }
+    </style>
+    <mata http-equiv = "Content-Type" content = "text.html; charset = utf-8">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    {% block content %}
+    {% endblock %}
+
+    {% block footer %}
+    {% endblock %}
+</body>
+</html>
