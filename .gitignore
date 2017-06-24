@@ -72,3 +72,4 @@ pagerank
 *.zip
 beautifulsoup4-4.4.0/
 jieba-master/
+.idea
